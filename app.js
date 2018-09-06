@@ -11,7 +11,7 @@ var cors = require('cors');
 var express = require('express');
 var app = express();
 app.use(cors());
-app.options('*', cors());  // це не дуже добре, треба поправити 
+app.options('http://localhost:3000/movies', cors());  // '*'
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
