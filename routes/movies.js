@@ -20,7 +20,7 @@ con.connect(function(err) {
 router.get('/', function(req, res, next) {
 
   console.log("Connected!");
-  var sql = "SELECT * FROM Movie";
+  var sql = "SELECT * FROM Movie ORDER BY title";
   con.query(sql, function (err, result) {
     if (err) throw err;
     res.status(200).send(result);
