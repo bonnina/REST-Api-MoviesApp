@@ -27,18 +27,6 @@ router.get('/', function(req, res, next) {
   });
 });
 
-/*
-router.get('/', function(req, res, next) {
-
-    console.log("Connected!");
-    var sql = "SELECT * FROM Movie WHERE Id = ?";
-    con.query(sql, [2], function (err, result) {
-      if (err) throw err;
-      res.status(200).send(result);
-    });
-});
-*/
-
 /* Create movie. */
 router.post('/', function(req, res, next) {
 
@@ -61,5 +49,27 @@ router.post('/', function(req, res, next) {
       res.status(201).send({movieId: movieId});
     });
   });
+
+/* DELETE movie */
+router.delete('/', function(req, res, next) {
+
+  var sql = "DELETE FROM Movie WHERE id = ?";
+  con.query(sql, [req.body.id], function (err, result) {
+    
+    if (err) throw err;
+    res.status(200).send(result.affectedRows);
+  });
+});
+
+/*
+router.get('/', function(req, res, next) {
+    console.log("Connected!");
+    var sql = "SELECT * FROM Star WHERE Id = ?";
+    con.query(sql, [req.body.id], function (err, result) {
+      if (err) throw err;
+      res.status(200).send(result);
+    });
+});
+*/
 
 module.exports = router;
