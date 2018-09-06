@@ -7,7 +7,11 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var moviesRouter = require('./routes/movies');
 
+var cors = require('cors');
+var express = require('express');
 var app = express();
+app.use(cors());
+app.options('*', cors());
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
