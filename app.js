@@ -50,23 +50,4 @@ app.get('/movies', function (req, res) {
 
 module.exports = app;
 
-// app.get('/movies', )
 
-// var server = app.listen(8081, function () {
-
-//   var host = server.address().address
-//   var port = server.address().port
-//   console.log("Example app listening at http://%s:%s", host, port)
-
-// })
-
-
-
-// var server = app.listen(8081, function () {
-
-//   var host = server.address().address
-//   var port = server.address().port
-
-//   console.log("Example app listening at http://%s:%s", host, port)
-
-// })
