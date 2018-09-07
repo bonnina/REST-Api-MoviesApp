@@ -51,13 +51,13 @@ router.post('/', function(req, res, next) {
   });
 
 /* DELETE movie */
-router.delete('/', function(req, res, next) {
+router.delete('/:id', function(req, res, next) {
 
   var sql = "DELETE FROM Movie WHERE id = ?";
-  con.query(sql, [req.body.id], function (err, result) {
+  con.query(sql, [req.params.id], function (err, result) {
     
     if (err) throw err;
-    res.status(200).send(result.affectedRows);
+    res.sendStatus(200);
   });
 });
 
