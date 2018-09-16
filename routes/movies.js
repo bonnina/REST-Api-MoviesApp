@@ -21,10 +21,33 @@ router.get('/', function(req, res, next) {
 
   console.log("Connected!");
   var sql = "SELECT * FROM Movie ORDER BY title";
-  con.query(sql, function (err, result) {
-    if (err) throw err;
-    res.status(200).send(result);
-  });
+
+  return new Promise( ( resolve, reject ) => {
+    con.query(sql, function ( err, result) {
+      if ( err ) return reject( err );
+      resolve( JSON.parse(JSON.stringify(result)) );
+    });
+  })
+  .then(resultMovies => {
+    var getStars = function (movie) { 
+
+      return new Promise((resolve, reject) => {
+        let sql = "SELECT MovieStar.StarId, Star.Name as StarName FROM MovieStar JOIN Star ON MovieStar.StarId = Star.Id WHERE MovieStar.MovieId = ?";
+        con.query(sql, [movie.Id], function (err, result) {
+
+          if (err) reject(err);
+          movie.Stars = JSON.parse(JSON.stringify(result));
+          resolve(movie);
+        });
+      });
+    };
+
+    var actions = resultMovies.map(getStars);
+    Promise.all(actions)
+      .then(data => res.status(200).send(data))
+      .catch(error => console.log(error.message));
+  })
+  .catch(error => console.log(error.message));
 });
 
 /* Create movie. */
