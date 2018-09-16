@@ -21,40 +21,33 @@ router.get('/', function(req, res, next) {
 
   console.log("Connected!");
   var sql = "SELECT * FROM Movie ORDER BY title";
-  var arrToSend = [];
 
   return new Promise( ( resolve, reject ) => {
     con.query(sql, function ( err, result) {
       if ( err ) return reject( err );
-      resolve( result );
+      resolve( JSON.parse(JSON.stringify(result)) );
     });
   })
-  .then(result => JSON.parse(JSON.stringify(result)))
   .then(resultMovies => {
-    resultMovies.forEach(movie => {
-      let sql = "SELECT * FROM MovieStar WHERE MovieId = ?";
-      con.query(sql, [movie.Id], function (err, result) {
-        if (err) throw err;
-        
-        let movieIds = JSON.parse(JSON.stringify(result)); 
-        movieIds.forEach(id => {
-          var sql = "SELECT * FROM Star WHERE Id = ?";
-          con.query(sql, [id.StarId], function (err, result) {
-            if (err) throw err;
-          
-            var actors = {};
-            let jsn = JSON.parse(JSON.stringify(result)); 
-            actors.Stars = jsn[0].Name;
-            let all4 = Object.assign(movie, actors);
-            arrToSend.push(all4);
-           // console.log(arrToSend); 
-          });
-        })
+    var getStars = function (movie) { 
+
+      return new Promise((resolve, reject) => {
+        let sql = "SELECT MovieStar.StarId, Star.Name as StarName FROM MovieStar JOIN Star ON MovieStar.StarId = Star.Id WHERE MovieStar.MovieId = ?";
+        con.query(sql, [movie.Id], function (err, result) {
+
+          if (err) reject(err);
+          movie.Stars = JSON.parse(JSON.stringify(result));
+          resolve(movie);
+        });
       });
-    });
-  //  return ???
+    };
+
+    var actions = resultMovies.map(getStars);
+    Promise.all(actions)
+      .then(data => res.status(200).send(data))
+      .catch(error => console.log(error.message));
   })
-  .then(res.status(200).send(arrToSend));  // console.log('To send: ' + arrToSend)
+  .catch(error => console.log(error.message));
 });
 
 /* Create movie. */
