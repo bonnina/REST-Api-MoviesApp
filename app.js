@@ -42,12 +42,6 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-app.get('/movies', function (req, res) {
-  res = {
-    data: 1
-  };
-})
-
 module.exports = app;
 
 
