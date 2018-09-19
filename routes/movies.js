@@ -59,6 +59,7 @@ router.post('/', function(req, res, next) {
       if (err) throw err;
 
       var movieId = result.insertId; 
+      console.log(movieId);
 
       req.body.stars.forEach(star => {
         var sql = "INSERT INTO MovieStar (MovieId, StarId) VALUES (?, ?)";
