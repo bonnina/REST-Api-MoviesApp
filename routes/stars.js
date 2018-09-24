@@ -28,8 +28,21 @@ router.get('/', function(req, res, next) {
   })
   .then(result => res.status(200).send(result))
   .catch(error => console.log(error.message));
-
 });
+
+/* Create actor */
+router.post('/', function(req, res, next) {
+
+    var sql = "INSERT INTO Star (Name) VALUES (?)";
+    con.query(sql, [req.body.name], function (err, result) {
+      
+      if (err) throw err;
+
+      console.log(result.insertId);
+
+      res.status(201).send({Id: result.insertId});
+    });
+  });
 
 
 module.exports = router;
