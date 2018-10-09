@@ -20,7 +20,7 @@ con.connect(function(err) {
 router.get('/', function(req, res, next) {
 
   console.log("Connected!");
-  var sql = "SELECT * FROM Movie ORDER BY title";
+  var sql = "SELECT * FROM Movie ORDER BY title"; 
 
   return new Promise( ( resolve, reject ) => {
     con.query(sql, function ( err, result) {
@@ -50,7 +50,19 @@ router.get('/', function(req, res, next) {
   .catch(error => console.log(error.message));
 });
 
-/* Create movie. */
+/* GET movie by title. */
+router.get('/:title', function(req, res, next) {
+  console.log("Connected!");
+  var sql = "SELECT * FROM Movie WHERE lower(Title) LIKE lower('%?%')";
+  con.query(sql, [req.params.title], function (err, result) {
+    if (err) throw err;
+    console.log( JSON.parse(JSON.stringify(result)) );
+    
+    res.status(200).send(result);
+  });
+});
+
+/* CREATE movie. */
 router.post('/', function(req, res, next) {
 
     var sql = "INSERT INTO Movie (Title, Year, Format) VALUES (?, ?, ?)";
@@ -86,14 +98,8 @@ router.delete('/:id', function(req, res, next) {
 });
 
 /*
-router.get('/', function(req, res, next) {
-    console.log("Connected!");
-    var sql = "SELECT * FROM Star WHERE Id = ?";
-    con.query(sql, [req.body.id], function (err, result) {
-      if (err) throw err;
-      res.status(200).send(result);
-    });
-});
+router.get('/:id', function (req, res)
+The only HTTP methods which have a body are POST and PUT.
 */
 
 module.exports = router;

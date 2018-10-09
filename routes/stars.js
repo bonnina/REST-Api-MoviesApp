@@ -19,7 +19,7 @@ con.connect(function(err) {
 /* GET actors */
 router.get('/', function(req, res, next) {
   console.log("Connected!");
-  var sql = "SELECT * FROM Star";  //WHERE lower(Name) LIKE lower('%?%')
+  var sql = "SELECT * FROM Star ORDER BY name";  //WHERE lower(Name) LIKE lower('%?%')
   return new Promise( ( resolve, reject ) => {
     con.query(sql, function ( err, result) {   // [name],
       if ( err ) return reject( err );
