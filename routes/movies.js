@@ -53,11 +53,11 @@ router.get('/', function(req, res, next) {
 /* GET movie by title. */
 router.get('/:title', function(req, res, next) {
   console.log("Connected!");
-  var sql = "SELECT * FROM Movie WHERE lower(Title) LIKE lower('%?%')";
-  con.query(sql, [req.params.title], function (err, result) {
+  var sql = "SELECT * FROM Movie WHERE lower(Title) LIKE lower(?)";
+  con.query(sql, [`%${req.params.title.toLowerCase()}%`], function (err, result) {
     if (err) throw err;
     console.log( JSON.parse(JSON.stringify(result)) );
-    
+
     res.status(200).send(result);
   });
 });
@@ -97,9 +97,5 @@ router.delete('/:id', function(req, res, next) {
   });
 });
 
-/*
-router.get('/:id', function (req, res)
-The only HTTP methods which have a body are POST and PUT.
-*/
 
 module.exports = router;

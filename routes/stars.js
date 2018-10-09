@@ -16,7 +16,7 @@ con.connect(function(err) {
   console.log("Connected!");
 });
 
-/* GET actors */
+/* GET all actors */
 router.get('/', function(req, res, next) {
   console.log("Connected!");
   var sql = "SELECT * FROM Star ORDER BY name";  //WHERE lower(Name) LIKE lower('%?%')
@@ -28,6 +28,18 @@ router.get('/', function(req, res, next) {
   })
   .then(result => res.status(200).send(result))
   .catch(error => console.log(error.message));
+});
+
+/* GET actor by name. */
+router.get('/:name', function(req, res, next) {
+  console.log("Connected!");
+  var sql = "SELECT * FROM Star WHERE lower(Name) LIKE lower(?)";
+  con.query(sql, [`%${req.params.name.toLowerCase()}%`], function (err, result) {
+    if (err) throw err;
+    console.log( JSON.parse(JSON.stringify(result)) );
+
+    res.status(200).send(result);
+  });
 });
 
 /* Create actor */
