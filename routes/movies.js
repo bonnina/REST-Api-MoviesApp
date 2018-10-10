@@ -94,10 +94,14 @@ router.put('/', function(req, res, next) {
     
     if (err) throw err;
     
-    req.body.stars.forEach(star => {
-      var sql = "UPDATE MovieStar SET StarId = ? WHERE MovieId = ?";
+    var sql = "DELETE FROM MovieStar WHERE MovieId = ?";
+    con.query(sql, [movieId], function (err, result) {
+      if (err) throw err;
+    });
 
-      con.query(sql, [star, movieId], function (err, result) {
+    req.body.stars.forEach(star => {
+      var sql = "INSERT INTO MovieStar (MovieId, StarId) VALUES (?, ?)";
+      con.query(sql, [movieId, star], function (err, result) {
     
         if (err) throw err;
       })

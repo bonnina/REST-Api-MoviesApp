@@ -19,9 +19,9 @@ con.connect(function(err) {
 /* GET all actors */
 router.get('/', function(req, res, next) {
   console.log("Connected!");
-  var sql = "SELECT * FROM Star ORDER BY name";  //WHERE lower(Name) LIKE lower('%?%')
+  var sql = "SELECT * FROM Star ORDER BY name";  
   return new Promise( ( resolve, reject ) => {
-    con.query(sql, function ( err, result) {   // [name],
+    con.query(sql, function ( err, result) {   
       if ( err ) return reject( err );
       resolve( JSON.parse(JSON.stringify(result)) );
     });
