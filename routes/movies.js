@@ -86,6 +86,30 @@ router.post('/', function(req, res, next) {
     });
   });
 
+/* UPDATE movie */
+router.put('/', function(req, res, next) {
+
+  var sql = "UPDATE Movie SET Title = ?, Year = ?, Format = ? WHERE id = ?";
+  con.query(sql, [req.body.title, req.body.year, req.body.format, req.body.id], function (err, result) {
+    
+    if (err) throw err;
+    console.log(result);
+    var movieId = result.insertId; 
+    console.log(movieId);
+
+    req.body.stars.forEach(star => {
+      var sql = "UPDATE MovieStar SET StarId = ? WHERE MovieId = ?";
+
+      con.query(sql, [star, movieId], function (err, result) {
+    
+        if (err) throw err;
+      })
+    });
+
+    res.status(201).send({movieId: movieId});
+  });
+});
+
 /* DELETE movie */
 router.delete('/:id', function(req, res, next) {
 
