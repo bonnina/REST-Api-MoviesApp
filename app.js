@@ -3,14 +3,17 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var fileUpload = require('express-fileupload');
 
 var indexRouter = require('./routes/index');
 var moviesRouter = require('./routes/movies');
 var starsRouter = require('./routes/stars');
+var uploadRouter = require('./routes/upload');
 
 var cors = require('cors');
 var express = require('express');
 var app = express();
+app.use(fileUpload());  // додала
 app.use(cors());
 app.options('*', cors());  // 'http://localhost:3000/movies'
 
@@ -27,6 +30,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/movies', moviesRouter);
 app.use('/stars', starsRouter);
+app.use('/upload', uploadRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
