@@ -13,9 +13,10 @@ var uploadRouter = require('./routes/upload');
 var cors = require('cors');
 var express = require('express');
 var app = express();
-app.use(fileUpload());  // додала
 app.use(cors());
 app.options('*', cors());  // 'http://localhost:3000/movies'
+
+app.use(fileUpload());  // додала
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

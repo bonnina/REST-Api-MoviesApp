@@ -1,26 +1,23 @@
 var express = require('express');
 var router = express.Router();
 
-var mysql = require('mysql');
-
-var con = mysql.createConnection({
-  host: "35.192.76.250",
-  user: "root",
-  password: "5131",
-  database: "dbo"
-});
-
-con.connect(function(err) {
-  if (err) throw err;
-  console.log("Connected!");
-});
-
 /* CREATE or UPDATE movie from file */
 router.post('/', function(req, res, next) {
     if (!req.files)
        res.status(400).send('No files were uploaded.');
     else {
-      var f = req.files.movies;
-      console.log(f);
+      var file = req.files.file;
+      console.log(file);
+      
+      file.mv('./uploaded/sample_movies.txt', function(err) {
+        if (err) {
+            console.log(err);
+            return res.status(500).send('error');
+        }
+     
+        res.status(200).send('ok');
+      });
     }
   });
+
+  module.exports = router;
