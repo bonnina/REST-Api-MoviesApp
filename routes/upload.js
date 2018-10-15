@@ -126,7 +126,7 @@ router.post('/', function(req, res, next) {
                   else {
                     var movieId = id;
                     var sql = "UPDATE Movie SET Title = ?, Year = ?, Format = ? WHERE id = ?";
-                    con.query(sql, [req.body.title, req.body.year, req.body.format, req.body.id], function (err, result) {
+                    con.query(sql, [movie[0][1], movie[1][1], movie[2][1],  movieId], function (err, result) {
                       if (err) throw err;
     
                        var sql = "DELETE FROM MovieStar WHERE MovieId = ?";
