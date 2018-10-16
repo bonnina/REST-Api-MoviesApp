@@ -22,7 +22,7 @@ router.post('/', function(req, res, next) {
       var file = req.files.file;
       console.log(file);
       return new Promise( ( resolve, reject ) => {
-        file.mv('./uploaded/sample_movies.txt', function(err) {
+        file.mv('./sample_movies.txt', function(err) {
           if (err) {
             console.log(err);
             return res.status(500).send('error');
@@ -32,7 +32,7 @@ router.post('/', function(req, res, next) {
         });
       })
       .then(() => {
-        fs.readFile('./uploaded/sample_movies.txt', 'utf8', function (error, data) {
+        fs.readFile('./sample_movies.txt', 'utf8', function (error, data) {
           if (error) throw error;
        
           var str = data.toString();
@@ -49,7 +49,7 @@ router.post('/', function(req, res, next) {
                 return;
               }
               // first, check if the movie already exists in DB
-              let title = JSON.stringify(movie[0][1]);
+              let title = movie[0][1];
               var sql = "SELECT * FROM Movie WHERE lower(Title) LIKE lower(?)";
               return new Promise( ( resolve, reject ) => {
                 con.query(sql, [`%${title.toLowerCase()}%`], function (err, result) {
