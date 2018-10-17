@@ -1,18 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var fs = require("fs");
-var mysql = require('mysql');
-
-var con = mysql.createConnection({
-  host: "35.192.76.250",
-  user: "root",
-  password: "5131",
-  database: "dbo"
-});
-
-con.connect(function(err) {
-  if (err) throw err;
-});
+var con = require('../services/database service');
 
 /* CREATE or UPDATE movie from file */
 router.post('/', function(req, res, next) {

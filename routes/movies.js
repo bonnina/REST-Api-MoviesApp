@@ -1,20 +1,6 @@
 var express = require('express');
 var router = express.Router();
-
-var mysql = require('mysql');
-
-var con = mysql.createConnection({
-  host: "35.192.76.250",
-  user: "root",
-  password: "5131",
-  database: "dbo"
-});
-
-con.connect(function(err) {
-
-  if (err) throw err;
-  console.log("Connected!");
-});
+var con = require('../services/database service');
 
 /* GET all movies. */
 router.get('/', function(req, res, next) {
