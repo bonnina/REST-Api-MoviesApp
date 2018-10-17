@@ -20,14 +20,11 @@ router.post('/', function(req, res, next) {
        res.status(400).send('No files were uploaded.');
     else {
       var file = req.files.file;
-      console.log(file);
+
       return new Promise( ( resolve, reject ) => {
         file.mv('./sample_movies.txt', function(err) {
-          if (err) {
-            console.log(err);
-            return res.status(500).send('error');
-          }
-          res.status(200).send('ok');
+          if (err) return res.status(500).send('error');
+        //  res.status(200).send('ok');
           resolve();
         });
       })
@@ -44,7 +41,6 @@ router.post('/', function(req, res, next) {
               resolve(movie);
             })
             .then((movie) => {
-             // console.log("Movie: " + movie);
               if (movie[0] === undefined) {
                 return;
               }
@@ -52,25 +48,25 @@ router.post('/', function(req, res, next) {
               let title = movie[0][1];
               var sql = "SELECT * FROM Movie WHERE lower(Title) LIKE lower(?)";
               return new Promise( ( resolve, reject ) => {
-                con.query(sql, [`%${title.toLowerCase()}%`], function (err, result) {
-                  if (err) throw err; 
+                con.query(sql, [`${title.toLowerCase()}`], function (err, result) {
+                  if (err) return reject(err); 
                   resolve(result);
                 });
               })
               .then((result) => {
                 // if there's no such movie in DB, create one
                 if (result[0] === undefined) {
-                  updOrCreate('POST');
+                  updOrCreateMovie('POST');
                 }
                 // if there is one, update movie details
                 else {
-                  updOrCreate('PUT', result[0].Id);
+                  updOrCreateMovie('PUT', result[0].Id);
                 }
               })
               .catch(error => console.log(error.message));
 
             // creates or updates a movie 
-            function updOrCreate(method, id) {
+            function updOrCreateMovie(method, id) {
               let stars = movie[3][1].split(', ');
 
               var postActor = function (el) { 
@@ -78,13 +74,13 @@ router.post('/', function(req, res, next) {
                   // check if this actor already exists in a DB
                   var sql = "SELECT * FROM Star WHERE lower(Name) LIKE lower(?)";
                   return new Promise( ( resolve, reject ) => {
-                    con.query(sql, [`%${el.toLowerCase()}%`], function (err, result) {
-                      if (err) throw err;
+                    con.query(sql, [`${el.toLowerCase()}`], function (err, result) {
+                      if (err) return reject(err);
                       resolve(result);
                     })
                   })
                   .then((result) => {
-                      console.log("Result: " + JSON.parse(JSON.stringify(result)) );
+                     // console.log("Result: " + JSON.parse(JSON.stringify(result)) );
                     if (result[0] === undefined) {
                         console.log("No such actor");
   
@@ -106,42 +102,60 @@ router.post('/', function(req, res, next) {
 
               let actions = stars.map(postActor);
               Promise.all(actions)
-                .then(data => {
-                  let idArr = data.map(el => el.Id);
+                .then(data => data.map(el => el.Id))
+                .then(idArr => {
+                  
+                  // adds an array of star IDs to the DB
+                  function postStarsArray(movieId) {
+                    var addStar = function(star) {
+                        return new Promise( ( resolve, reject ) => {
+                          var sql = "INSERT INTO MovieStar (MovieId, StarId) VALUES (?, ?)";
+                          con.query(sql, [movieId, star], function (err, result) {
+                            if (err) throw err;
+                            resolve(result);
+                          })
+                       });
+                      };
+                      var actions = idArr.map(addStar);
+                      Promise.all(actions)
+                      .then((data) => {
+                          //console.log(data)
+                      })
+                      .catch(error => console.log(error.message));
+                  }
 
                   if (method === 'POST') {
+                    return new Promise( ( resolve, reject ) => {
                     var sql = "INSERT INTO Movie (Title, Year, Format) VALUES (?, ?, ?)";
                     con.query(sql, [movie[0][1], movie[1][1], movie[2][1]], function (err, result) {
-                      if (err) throw err;
-                      var movieId = result.insertId;
-
-                      idArr.forEach(star => {
-                        var sql = "INSERT INTO MovieStar (MovieId, StarId) VALUES (?, ?)";
-                        con.query(sql, [movieId, star], function (err, result) {
-                         if (err) throw err;
-                        })
-                      });
+                      if (err) return reject(err);
+                      resolve(result.insertId);
                     });
+                    })
+                    .then((movieId) => {
+                        postStarsArray(movieId);
+                    })
+                    .catch(error => console.log(error.message));
                   } // end if post
                   else {
                     var movieId = id;
-                    var sql = "UPDATE Movie SET Title = ?, Year = ?, Format = ? WHERE id = ?";
-                    con.query(sql, [movie[0][1], movie[1][1], movie[2][1],  movieId], function (err, result) {
-                      if (err) throw err;
-    
+                    return new Promise( ( resolve, reject ) => {
+                      var sql = "UPDATE Movie SET Title = ?, Year = ?, Format = ? WHERE id = ?";
+                      con.query(sql, [movie[0][1], movie[1][1], movie[2][1],  movieId], function (err, result) {
+                        if (err) throw err;
+                        resolve(result);
+                      });
+                    })
+                    .then(r => {
                        var sql = "DELETE FROM MovieStar WHERE MovieId = ?";
                        con.query(sql, [movieId], function (err, result) {
                         if (err) throw err;
+                        return result;
                        });
-
-                       idArr.forEach(star => {
-                         var sql = "INSERT INTO MovieStar (MovieId, StarId) VALUES (?, ?)";
-                         con.query(sql, [movieId, star], function (err, result) {
-                           if (err) throw err;
-                         })
-                       });
-                      
-                   }); 
+                    })
+                    .then(r => {
+                        postStarsArray(movieId);
+                    }); 
                   } // end else (put)
                 })
                 .catch(error => console.log(error.message));
