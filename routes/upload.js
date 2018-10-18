@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var fs = require("fs");
-var con = require('../services/database service');
+// var con = require('../services/database service');
 const getMovieByTitle = require('../methods/getMovieByTitle');
 const createMovie =  require('../methods/createMovie');
 const updateMovie = require('../methods/updateMovie');
@@ -13,7 +13,7 @@ router.post('/', function(req, res, next) {
     if (!req.files)
        res.status(400).send('No files were uploaded.');
     else {
-      var file = req.files.file;
+      const file = req.files.file;
 
       return new Promise( ( resolve, reject ) => {
         file.mv('./sample_movies.txt', function(err) {
@@ -25,12 +25,12 @@ router.post('/', function(req, res, next) {
         fs.readFile('./sample_movies.txt', 'utf8', function (error, data) {
           if (error) throw error;
        
-          var str = data.toString();
-          let arr = str.split('\n\n').map(el => el.split('\n'));
+          const str = data.toString();
+          const arr = str.split('\n\n').map(el => el.split('\n'));
 
-          var handleMovie = function(m) {
+          const handleMovie = function(m) {
             return new Promise( ( resolve, reject ) => {
-                var movie =  m.map(el => el.split(': '));
+                let movie =  m.map(el => el.split(': '));
                 resolve(movie);
               })
               .then((movie) => {
@@ -55,7 +55,7 @@ router.post('/', function(req, res, next) {
                 .catch(error => console.log(error.message));
               });  // end then(movie)
           };
-          var actions = arr.map(handleMovie);
+          const actions = arr.map(handleMovie);
           Promise.all(actions)
           .then(data => res.sendStatus(200))
           .catch(error => console.log(error.message));
