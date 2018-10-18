@@ -108,5 +108,15 @@ router.delete('/:id', function(req, res, next) {
   });
 });
 
+// DELETE all movies
+router.delete('/', function(req, res, next) {
+
+  var sql = "DELETE FROM Movie"
+  con.query(sql, function (err, result) {
+    
+    if (err) throw err;
+    res.sendStatus(200);
+  });
+});
 
 module.exports = router;
