@@ -15,7 +15,7 @@ const app = express();
 app.use(cors());
 app.options('*', cors());  // 'http://localhost:3000/movies'
 
-app.use(fileUpload());  // додала
+app.use(fileUpload());  
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

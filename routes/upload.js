@@ -2,6 +2,11 @@ var express = require('express');
 var router = express.Router();
 var fs = require("fs");
 var con = require('../services/database service');
+const getMovieByTitle = require('../methods/getMovieByTitle');
+const createMovie =  require('../methods/createMovie');
+const updateMovie = require('../methods/updateMovie');
+const getActorByName = require('../methods/getActorByName');
+const createActor = require('../methods/createActor');
 
 /* CREATE or UPDATE movie from file */
 router.post('/', function(req, res, next) {
@@ -34,11 +39,8 @@ router.post('/', function(req, res, next) {
                   return;
                 }
                 // first, check if the movie already exists in DB
-                let title = movie[0][1];
-                var sql = "SELECT * FROM Movie WHERE lower(Title) LIKE lower(?)";
                 return new Promise( ( resolve, reject ) => {
-                  con.query(sql, [`${title.toLowerCase()}`], function (err, result) {
-                    if (err) return reject(err); 
+                  getMovieByTitle(movie[0][1], function (result) {
                     resolve(result);
                   });
                 })
@@ -65,46 +67,37 @@ router.post('/', function(req, res, next) {
     }
   });
 
+  // adds an actor to the DB (if there isn't one) or returns actor's id
+  let postActor = function (el) { 
+    return new Promise((resolve, reject) => {
+      // check if this actor already exists in a DB
+      return new Promise( ( resolve, reject ) => {
+        getActorByName(el, (result) => resolve(result) );
+      })
+      .then((result) => {
+         // console.log("Result: " + JSON.parse(JSON.stringify(result)) );
+        if (result[0] === undefined) {
+          console.log("No such actor");
+          createActor(el, (result) => resolve(result) );
+        }
+        else {
+          console.log("match");
+          resolve({Id: result[0].Id});
+        }
+      });
+    })
+    .catch(error => console.log(error.message)); 
+  } 
+
   // creates or updates a movie 
   function updOrCreateMovie(movie, method, id) {
     let stars = movie[3][1].split(', ');
-
-    var postActor = function (el) { 
-      return new Promise((resolve, reject) => {
-        // check if this actor already exists in a DB
-        var sql = "SELECT * FROM Star WHERE lower(Name) LIKE lower(?)";
-        return new Promise( ( resolve, reject ) => {
-          con.query(sql, [`${el.toLowerCase()}`], function (err, result) {
-            if (err) return reject(err);
-            resolve(result);
-          })
-        })
-        .then((result) => {
-           // console.log("Result: " + JSON.parse(JSON.stringify(result)) );
-          if (result[0] === undefined) {
-              console.log("No such actor");
-
-              var sql = "INSERT INTO Star (Name) VALUES (?)";
-              con.query(sql, [el], function (err, result) {
-                if (err) throw err;
-               // console.log(result.insertId);
-                resolve({Id: result.insertId});
-              });
-          }
-          else {
-              console.log("match");
-              resolve({Id: result[0].Id});
-          }
-        });
-      })
-      .catch(error => console.log(error.message)); // end promise
-    } // end postActor func
-
+    
     let actions = stars.map(postActor);
     Promise.all(actions)
       .then(data => data.map(el => el.Id))
       .then(idArr => {
-        
+      /*   
         // adds an array of star IDs to the DB
         function postStarsArray(movieId) {
           var addStar = function(star) {
@@ -123,8 +116,12 @@ router.post('/', function(req, res, next) {
             })
             .catch(error => console.log(error.message));
         }
-
+      */
         if (method === 'POST') {
+          createMovie(movie[0][1], movie[1][1], movie[2][1], idArr, function (result) {
+            console.log("Added movie: " + result);
+          });
+        /*
           return new Promise( ( resolve, reject ) => {
           var sql = "INSERT INTO Movie (Title, Year, Format) VALUES (?, ?, ?)";
           con.query(sql, [movie[0][1], movie[1][1], movie[2][1]], function (err, result) {
@@ -136,27 +133,13 @@ router.post('/', function(req, res, next) {
               postStarsArray(movieId);
           })
           .catch(error => console.log(error.message));
-        } // end if post
+        */
+        }
         else {
-          var movieId = id;
-          return new Promise( ( resolve, reject ) => {
-            var sql = "UPDATE Movie SET Title = ?, Year = ?, Format = ? WHERE id = ?";
-            con.query(sql, [movie[0][1], movie[1][1], movie[2][1],  movieId], function (err, result) {
-              if (err) throw err;
-              resolve(result);
-            });
-          })
-          .then(r => {
-             var sql = "DELETE FROM MovieStar WHERE MovieId = ?";
-             con.query(sql, [movieId], function (err, result) {
-              if (err) throw err;
-              return result;
-             });
-          })
-          .then(r => {
-              postStarsArray(movieId);
-          }); 
-        } // end else (put)
+          updateMovie(movie[0][1], movie[1][1], movie[2][1], id, idArr, function (result) {
+            console.log("Updated movie: " + result);
+          });
+        } 
       })
       .catch(error => console.log(error.message));
   } // end updOrCreate
