@@ -1,18 +1,17 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var fileUpload = require('express-fileupload');
+const createError = require('http-errors');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const fileUpload = require('express-fileupload');
 
-var indexRouter = require('./routes/index');
-var moviesRouter = require('./routes/movies');
-var starsRouter = require('./routes/stars');
-var uploadRouter = require('./routes/upload');
+const indexRouter = require('./routes/index');
+const moviesRouter = require('./routes/movies');
+const starsRouter = require('./routes/stars');
+const uploadRouter = require('./routes/upload');
 
-var cors = require('cors');
-var express = require('express');
-var app = express();
+const cors = require('cors');
+const express = require('express');
+const app = express();
 app.use(cors());
 app.options('*', cors());  // 'http://localhost:3000/movies'
 

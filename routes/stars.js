@@ -1,46 +1,30 @@
-var express = require('express');
-var router = express.Router();
-var con = require('../services/database service');
+const express = require('express');
+const router = express.Router();
+const getAllActors = require('../methods/getAllActors');
+const getActorByName = require('../methods/getActorByName');
+const createActor = require('../methods/createActor');
+
 
 /* GET all actors */
 router.get('/', function(req, res, next) {
-  console.log("Connected!");
-  var sql = "SELECT * FROM Star ORDER BY name";  
-  return new Promise( ( resolve, reject ) => {
-    con.query(sql, function ( err, result) {   
-      if ( err ) return reject( err );
-      resolve( JSON.parse(JSON.stringify(result)) );
-    });
-  })
-  .then(result => res.status(200).send(result))
-  .catch(error => console.log(error.message));
+  getAllActors(function (result) {
+    res.status(200).send(result);
+  });
 });
 
 /* GET actor by name. */
 router.get('/:name', function(req, res, next) {
-  console.log("Connected!");
-  var sql = "SELECT * FROM Star WHERE lower(Name) LIKE lower(?)";
-  con.query(sql, [`%${req.params.name.toLowerCase()}%`], function (err, result) {
-    if (err) throw err;
-    console.log( JSON.parse(JSON.stringify(result)) );
-
+  getActorByName(req.params.name, function (result) {
     res.status(200).send(result);
   });
 });
 
 /* Create actor */
 router.post('/', function(req, res, next) {
-
-    var sql = "INSERT INTO Star (Name) VALUES (?)";
-    con.query(sql, [req.body.name], function (err, result) {
-      
-      if (err) throw err;
-
-      console.log(result.insertId);
-
-      res.status(201).send({Id: result.insertId});
-    });
+  createActor(req.body.name, function (result) {
+    res.status(201).send(result);
   });
+});
 
 
 module.exports = router;

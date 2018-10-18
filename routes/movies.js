@@ -1,6 +1,5 @@
-var express = require('express');
-var router = express.Router();
-var con = require('../services/database service');
+const express = require('express');
+const router = express.Router();
 const getMovieByTitle = require('../methods/getMovieByTitle');
 const getAllMovies = require('../methods/getAllMovies');
 const createMovie =  require('../methods/createMovie');
@@ -23,18 +22,6 @@ router.get('/:title', function(req, res, next) {
     res.status(200).send(result);
   });
 });
-/*
-router.get('/:title', function(req, res, next) {
-  console.log("Connected!");
-  var sql = "SELECT * FROM Movie WHERE lower(Title) LIKE lower(?)";
-  con.query(sql, [`%${req.params.title.toLowerCase()}%`], function (err, result) {
-    if (err) throw err;
-    console.log( JSON.parse(JSON.stringify(result)) );
-
-    res.status(200).send(result);
-  });
-});
-*/
 
 /* CREATE movie. */
 router.post('/', function(req, res, next) {
