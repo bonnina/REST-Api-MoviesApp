@@ -18,7 +18,6 @@ router.post('/', function(req, res, next) {
       return new Promise( ( resolve, reject ) => {
         file.mv('./sample_movies.txt', function(err) {
           if (err) return res.status(500).send('error');
-        //  res.status(200).send('ok');
           resolve();
         });
       })
@@ -38,11 +37,10 @@ router.post('/', function(req, res, next) {
                 if (movie[0] === undefined) {
                   return;
                 }
+
                 // first, check if the movie already exists in DB
                 return new Promise( ( resolve, reject ) => {
-                  getMovieByTitle(movie[0][1], function (result) {
-                    resolve(result);
-                  });
+                  getMovieByTitle(movie[0][1], (result) => resolve(result));
                 })
                 .then((result) => {
                   // if there's no such movie in DB, create one
@@ -61,7 +59,6 @@ router.post('/', function(req, res, next) {
           Promise.all(actions)
           .then(data => res.sendStatus(200))
           .catch(error => console.log(error.message));
-        
         }); // end fs
       });
     }
@@ -70,7 +67,6 @@ router.post('/', function(req, res, next) {
   // adds an actor to the DB (if there isn't one) or returns actor's id
   let postActor = function (el) { 
     return new Promise((resolve, reject) => {
-      // check if this actor already exists in a DB
       return new Promise( ( resolve, reject ) => {
         getActorByName(el, (result) => resolve(result) );
       })
@@ -142,6 +138,6 @@ router.post('/', function(req, res, next) {
         } 
       })
       .catch(error => console.log(error.message));
-  } // end updOrCreate
+  }  
 
   module.exports = router;
