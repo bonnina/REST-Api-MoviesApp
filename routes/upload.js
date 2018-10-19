@@ -16,13 +16,13 @@ router.post('/', function(req, res, next) {
       const file = req.files.file;
 
       return new Promise( ( resolve, reject ) => {
-        file.mv('./sample_movies.txt', function(err) {
+        file.mv('./views/sample_movies.txt', function(err) {
           if (err) return res.status(500).send('error');
           resolve();
         });
       })
       .then(() => {
-        fs.readFile('./sample_movies.txt', 'utf8', function (error, data) {
+        fs.readFile('./views/sample_movies.txt', 'utf8', function (error, data) {
           if (error) throw error;
        
           const str = data.toString();
@@ -72,6 +72,7 @@ router.post('/', function(req, res, next) {
       })
       .then((result) => {
          // console.log("Result: " + JSON.parse(JSON.stringify(result)) );
+         console.log(result);
         if (result[0] === undefined) {
           console.log("No such actor");
           createActor(el, (result) => resolve(result) );
