@@ -8,7 +8,7 @@ const deleteMovie = require('../methods/deleteMovie');
 const deleteAllMovies = require('../methods/deleteAllMovies');
 
 /* GET all movies. */
-router.get('/', function(req, res, next) {
+router.get('/', function(req, res) {
 
   getAllMovies(function (result) {
     res.status(200).send(result);
@@ -16,7 +16,7 @@ router.get('/', function(req, res, next) {
 });
 
 /* GET movie by title. */
-router.get('/:title', function(req, res, next) {
+router.get('/:title', function(req, res) {
 
   getMovieByTitle(req.params.title, function (result) {
     res.status(200).send(result);
@@ -24,21 +24,21 @@ router.get('/:title', function(req, res, next) {
 });
 
 /* CREATE movie. */
-router.post('/', function(req, res, next) {
+router.post('/', function(req, res) {
   createMovie(req.body.title, req.body.year, req.body.format, req.body.stars, function (result) {
     res.status(201).send(result);
   });
 });
 
 /* UPDATE movie */
-router.put('/', function(req, res, next) {
+router.put('/', function(req, res) {
   updateMovie(req.body.title, req.body.year, req.body.format, req.body.id, req.body.stars, function (result) {
     res.status(201).send(result);
   });
 });
 
 /* DELETE movie */
-router.delete('/:id', function(req, res, next) {
+router.delete('/:id', function(req, res) {
   deleteMovie(req.params.id, function (result) {
     res.sendStatus(200);
   //  res.status(200).send(result);  
@@ -46,7 +46,7 @@ router.delete('/:id', function(req, res, next) {
 });
 
 // DELETE all movies
-router.delete('/', function(req, res, next) {
+router.delete('/', function(req, res) {
   deleteAllMovies(function (result) {
     res.sendStatus(200);
     //  res.status(200).send(result); 
